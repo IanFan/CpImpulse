@@ -1,8 +1,8 @@
 //
 //  AppDelegate.m
-//  CpImpulse
+//  BasicCocos2D
 //
-//  Created by Ian Fan on 30/12/12.
+//  Created by Fan Tsai Ming on 11/07/12.
 //  Copyright __MyCompanyName__ 2012. All rights reserved.
 //
 
@@ -15,6 +15,11 @@
 
 @synthesize window=window_, navController=navController_, director=director_;
 
++ (AppController *)sharedAppDelegate
+{
+	return (AppController *) [[UIApplication sharedApplication] delegate];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Create the main window
@@ -22,13 +27,15 @@
 
 
 	// Create an CCGLView with a RGB565 color buffer, and a depth buffer of 0-bits
-	CCGLView *glView = [CCGLView viewWithFrame:[window_ bounds]
+	glView = [CCGLView viewWithFrame:[window_ bounds]
 								   pixelFormat:kEAGLColorFormatRGB565	//kEAGLColorFormatRGBA8
 								   depthFormat:0	//GL_DEPTH_COMPONENT24_OES
 							preserveBackbuffer:NO
 									sharegroup:nil
 								 multiSampling:NO
 							   numberOfSamples:0];
+  
+  [glView setMultipleTouchEnabled:YES];
 
 	director_ = (CCDirectorIOS*) [CCDirector sharedDirector];
 
@@ -73,29 +80,50 @@
 	[CCTexture2D PVRImagesHavePremultipliedAlpha:YES];
 
 	// and add the scene to the stack. The director will run it when it automatically when the view is displayed.
-	[director_ pushScene: [IntroLayer scene]]; 
-
+//	[director_ pushScene: [MainLayer scene]];
+  [director_ pushScene:[IntroLayer scene]];
 	
 	// Create a Navigation Controller with the Director
-	navController_ = [[UINavigationController alloc] initWithRootViewController:director_];
+//	navController_ = [[UINavigationController alloc] initWithRootViewController:director_];
+  navController_ = [[UINavigationController alloc] initWithRootViewController:director_];
 	navController_.navigationBarHidden = YES;
 	
 	// set the Navigation Controller as the root view controller
 //	[window_ addSubview:navController_.view];	// Generates flicker.
 	[window_ setRootViewController:navController_];
+  ////  [self supportedInterfaceOrientations];
+  ////  [navController_ supportedInterfaceOrientations];
 	
 	// make main window visible
 	[window_ makeKeyAndVisible];
-	
+  
+//  [TestFlight takeOff:@"e8b773e89c140d3a15b1f8a19b01ecd7_MTQ2NTk5MjAxMi0xMC0yMyAxMTozMTo0NS42ODEwMjk"];
+
 	return YES;
+}
+////
+-(BOOL)shouldAutorotate {
+  return YES;
+}
+////
+- (NSUInteger) supportedInterfaceOrientations
+{
+  return UIInterfaceOrientationMaskLandscape;
+}
+////
+-(void)willRotateToInterfaceOrientation: (UIInterfaceOrientation)orientation duration:(NSTimeInterval)duration {
 }
 
 // Supported orientations: Landscape. Customize it for your own needs
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-	return UIInterfaceOrientationIsLandscape(interfaceOrientation);
+  	return UIInterfaceOrientationIsLandscape(interfaceOrientation);
 }
 
+-(void)relayoutGlView {
+  CGSize screenSize = [CCDirector sharedDirector].winSize;
+  [glView setFrame:CGRectMake(0, 0, screenSize.width, screenSize.height)];
+}
 
 // getting a call, pause the game
 -(void) applicationWillResignActive:(UIApplication *)application
